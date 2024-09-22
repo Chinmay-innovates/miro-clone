@@ -8,6 +8,8 @@ import Link from "next/link";
 import { Overlay } from "./overlay";
 import { Footer } from "./footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BoardActions } from "@/components/board-actions";
+import { MoreHorizontal } from "lucide-react";
 
 interface BoardCardProps {
 	id: string;
@@ -64,17 +66,11 @@ export const BoardCard = ({
 						priority={true}
 					/>
 					<Overlay />
-					{/* <BoardActions side="right" id={id} title={title}> */}
-					<Button className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 py-1 outline-none bg-transparent hover:bg-transparent">
-						<Image
-							src="/icons/More.svg"
-							alt="More icon"
-							width={28}
-							height={28}
-							className="text-white opacity-65 hover:opacity-100 transition-opacity bg-white rounded-lg size-auto"
-						/>
-					</Button>
-					{/* </BoardActions> */}
+					<BoardActions side="right" sideOffset={12} id={id} title={title}>
+						<Button className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 py-1 outline-none bg-transparent hover:bg-transparent">
+							<MoreHorizontal className="text-white opacity-75 hover:opacity-100  transition-opacity" />
+						</Button>
+					</BoardActions>
 				</div>
 				<Footer
 					isFavorite={isFavourite}
