@@ -9,7 +9,8 @@ import { Overlay } from "./overlay";
 import { Footer } from "./footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BoardActions } from "@/components/board-actions";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Star } from "lucide-react";
+import { toast } from "sonner";
 
 interface BoardCardProps {
 	id: string;
@@ -39,20 +40,34 @@ export const BoardCard = ({
 		addSuffix: true,
 	});
 
-	// const { mutate: onFavorite, pending: pendingFavorite } = useApiMutation(
-	// 	api.board.favorite
-	// );
-	// const { mutate: onUnFavorite, pending: pendingUnFavorite } = useApiMutation(
-	// 	api.board.unfavorite
-	// );
+	const { mutate: onFavourite, pending: pendingFavourite } = useApiMutation(
+		api.board.favourite
+	);
+	const { mutate: onUnfavourite, pending: pendingUnfavourite } = useApiMutation(
+		api.board.unfavourite
+	);
 
-	// const toggleFavorite = () => {
-	// 	if (isFavorite) {
-	// 		onUnFavorite({ id }).catch(() => toast.error("Failed to unfavorite"));
-	// 	} else {
-	// 		onFavorite({ id, orgId }).catch(() => toast.error("Failed to favorite"));
-	// 	}
-	// };
+	const toggleFavorite = () => {
+		if (isFavourite) {
+			const promise = onUnfavourite({ id }).catch((err) =>
+				toast.error(err.message)
+			);
+			toast.promise(promise, {
+				loading: "Unfavouriting board...",
+				success: "Board unfavourited successfully",
+				error: "Failed to unfavorite",
+			});
+		} else {
+			const promise = onFavourite({ id, orgId: organizationId }).catch((err) =>
+				toast.error(err.message)
+			);
+			toast.promise(promise, {
+				loading: "Favouriting board...",
+				success: "Board favourited successfully",
+				error: "Failed to favourite",
+			});
+		}
+	};
 
 	return (
 		<Link href={`/board/${id}`}>
@@ -77,8 +92,8 @@ export const BoardCard = ({
 					title={title}
 					authorLabel={authorLabel}
 					createdAtLabel={createdAtlabel}
-					onClick={() => {}}
-					disabled={false}
+					onClick={toggleFavorite}
+					disabled={pendingFavourite || pendingUnfavourite}
 				/>
 			</div>
 		</Link>
