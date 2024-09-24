@@ -39,6 +39,7 @@ import { SelectionBox } from "./selection-box";
 import { update } from "../../../../convex/board";
 import { set } from "date-fns";
 import { CursorPresence } from "./cursor-presence";
+import { Status } from "./status";
 const MAX_LAYERS = 100;
 
 interface CanvasProps {
@@ -437,7 +438,9 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 		<main className="h-full w-full relative bg-neutral-100 touch-none">
 			<Info boardId={boardId} />
 			<Participants />
-			<div className="absolute right-2 bottom-3">{/* <Status /> */}</div>
+			<div className="absolute right-2 bottom-3">
+				<Status />
+			</div>
 			<Toolbar
 				canvasState={canvasState}
 				setCanvasState={setCanvasState}
