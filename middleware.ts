@@ -4,7 +4,7 @@ import { authMiddleware } from "@clerk/nextjs";
 // Please edit this to allow other routes to be public as needed.
 
 export default authMiddleware({
-  ignoredRoutes: ["/"],
+  // publicRoutes: ["/"],
 });
 
 export const config = {

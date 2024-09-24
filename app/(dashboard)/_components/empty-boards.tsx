@@ -18,7 +18,7 @@ export const EmptyBoards = () => {
 			orgId: organization.id,
 			title: "Untitled",
 		}).then((boardId) => {
-			// router.push(`/board/${boardId}`);
+			router.push(`/board/${boardId}`);
 		});
 		toast.promise(promise, {
 			loading: "Creating your board...",

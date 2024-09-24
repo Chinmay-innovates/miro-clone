@@ -25,7 +25,7 @@ export const CreateBoardButton = ({
 			orgId: orgId,
 			title: "Untitled",
 		}).then((boardId) => {
-			// router.push(`/board/${boardId}`);
+			router.push(`/board/${boardId}`);
 		});
 		toast.promise(promise, {
 			loading: "Creating your board...",
