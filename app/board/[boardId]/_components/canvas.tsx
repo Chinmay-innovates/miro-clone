@@ -16,6 +16,7 @@ import {
 import {
 	colorToCss,
 	connectionIdToColor,
+	findIntersectingLayersWithRectangle,
 	pointerEventToCanvasPoint,
 	resizeBounds,
 } from "@/lib/utils";
@@ -32,14 +33,18 @@ import {
 
 import { Info } from "./info";
 import { Toolbar } from "./toolbar";
+import { Status } from "./status";
 import { Participants } from "./participants";
-
 import { LayerPreview } from "./layer-preview";
 import { SelectionBox } from "./selection-box";
-import { update } from "../../../../convex/board";
-import { set } from "date-fns";
 import { CursorPresence } from "./cursor-presence";
-import { Status } from "./status";
+
+import { update } from "../../../../convex/board";
+
+import { set } from "date-fns";
+import { SelectionTools } from "./selection-tools";
+
+const SELECTION_NET_THRESHOLD = 5;
 const MAX_LAYERS = 100;
 
 interface CanvasProps {
@@ -65,6 +70,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 	const canUndo = useCanUndo();
 	const canRedo = useCanRedo();
 
+	/* >>>>>>>>>>> LAYERS >>>>>>>>>>> */
 	const insertLayer = useMutation(
 		(
 			{ storage, setMyPresence },
@@ -144,20 +150,23 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 				current,
 			});
 
-			// const ids = findIntersectingLayersWithRectangle(
-			// 	layerIds,
-			// 	layers,
-			// 	origin,
-			// 	current
-			// );
+			const ids = findIntersectingLayersWithRectangle(
+				layerIds,
+				layers,
+				origin,
+				current
+			);
 
-			// setMyPresence({ selection: ids });
+			setMyPresence({ selection: ids });
 		},
 		[layerIds]
 	);
 
 	const startMultiSelection = useCallback((current: Point, origin: Point) => {
-		if (Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) > 5) {
+		if (
+			Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) >
+			SELECTION_NET_THRESHOLD
+		) {
 			setCanvasState({
 				mode: CanvasMode.SELECTION_NET,
 				origin,
@@ -166,6 +175,29 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 		}
 	}, []);
 
+	const resizeSelectedLayer = useMutation(
+		({ storage, self }, point: Point) => {
+			if (canvasState.mode !== CanvasMode.RESIZING) {
+				return;
+			}
+
+			const bounds = resizeBounds(
+				canvasState.initialBounds,
+				canvasState.corner,
+				point
+			);
+
+			const liveLayers = storage.get("layers");
+			const layer = liveLayers.get(self.presence.selection[0]);
+
+			if (layer) {
+				layer.update(bounds);
+			}
+		},
+		[canvasState]
+	);
+
+	/* >>>>>>>>>>> DRAWING >>>>>>>>>>> */
 	// const continueDrawing = useMutation(
 	// 	({ self, setMyPresence }, point: Point, e: React.PointerEvent) => {
 	// 		const { pencilDraft } = self.presence;
@@ -230,28 +262,14 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 	// 	[lastUsedColor]
 	// );
 
-	const resizeSelectedLayer = useMutation(
-		({ storage, self }, point: Point) => {
-			if (canvasState.mode !== CanvasMode.RESIZING) {
-				return;
-			}
+	const onWheel = useCallback((e: React.WheelEvent) => {
+		setCamera((camera) => ({
+			x: camera.x - e.deltaX,
+			y: camera.y - e.deltaY,
+		}));
+	}, []);
 
-			const bounds = resizeBounds(
-				canvasState.initialBounds,
-				canvasState.corner,
-				point
-			);
-
-			const liveLayers = storage.get("layers");
-			const layer = liveLayers.get(self.presence.selection[0]);
-
-			if (layer) {
-				layer.update(bounds);
-			}
-		},
-		[canvasState]
-	);
-
+	/* >>>>>>>>>>> POINTER_EVENTS >>>>>>>>>>> */
 	const onResizeHandlePointerDown = useCallback(
 		(corner: Side, initialBounds: XYWH) => {
 			history.pause();
@@ -263,13 +281,6 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 		},
 		[history]
 	);
-
-	const onWheel = useCallback((e: React.WheelEvent) => {
-		setCamera((camera) => ({
-			x: camera.x - e.deltaX,
-			y: camera.y - e.deltaY,
-		}));
-	}, []);
 
 	const onPointerMove = useMutation(
 		({ setMyPresence }, e: React.PointerEvent) => {
@@ -449,6 +460,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 				canUndo={canUndo}
 				canRedo={canRedo}
 			/>
+			<SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
 			<svg
 				className="h-[100vh] w-[100vw]"
 				onWheel={onWheel}
@@ -471,6 +483,16 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 						/>
 					))}
 					<SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
+					{canvasState.mode === CanvasMode.SELECTION_NET &&
+						canvasState.current != null && (
+							<rect
+								className="fill-blue-500/5 stroke-blue-500 stroke-1"
+								x={Math.min(canvasState.origin.x, canvasState.current.x)}
+								y={Math.min(canvasState.origin.y, canvasState.current.y)}
+								width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+								height={Math.abs(canvasState.origin.y - canvasState.current.y)}
+							/>
+						)}
 
 					<CursorPresence />
 				</g>
