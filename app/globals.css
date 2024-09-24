@@ -6,6 +6,27 @@
   .text-balance {
     text-wrap: balance;
   }
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+  }
+  .scrollbar::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    background: #09090a;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #29292d;
+    border-radius: 50px;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2b2b2f;
+  }
 }
 
 html,
@@ -76,5 +97,10 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+@layer components {
+  .selection-outline {
+    @apply fill-white stroke-1 stroke-blue-500;
   }
 }

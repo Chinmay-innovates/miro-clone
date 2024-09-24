@@ -79,7 +79,7 @@ export enum Side {
   TOP = 1,
   BOTTOM = 2,
   LEFT = 4,
-  RIGHR = 8,
+  RIGHT = 8,
 }
 
 export type CanvasState =
