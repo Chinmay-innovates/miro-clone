@@ -14,6 +14,7 @@ import { api } from "@/convex/_generated/api";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Button } from "@/components/ui/button";
 import { useRenameModal } from "@/store/use-rename-modal";
+import { Separator } from "./ui/separator";
 
 interface ActionsProps {
 	children: React.ReactNode;
@@ -70,6 +71,7 @@ export const BoardActions = ({
 					<Pencil className="size-4 mr-2" />
 					Rename
 				</DropdownMenuItem>
+				<Separator />
 				<ConfirmModal
 					header="Delete board?"
 					description="This will delete the board and all of its contents."
@@ -78,7 +80,7 @@ export const BoardActions = ({
 				>
 					<Button
 						variant="ghost"
-						className="p-3 cursor-pointer text-sm w-full justify-start font-normal"
+						className="p-3 cursor-pointer text-sm w-full justify-start font-normal hover:bg-rose-400/40"
 					>
 						<Trash2 className="size-4 mr-2" />
 						Delete
