@@ -9,7 +9,7 @@ import { Overlay } from "./overlay";
 import { Footer } from "./footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BoardActions } from "@/components/board-actions";
-import { MoreHorizontal, Star } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 interface BoardCardProps {
